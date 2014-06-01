@@ -12,7 +12,9 @@ include ( CMake_Defaults.txt )
 
 add_subdirectory( DescentEngine )
 add_subdirectory( DescentLogic )
-add_subdirectory( DescentGame )
+# disabled game build in default config, as Travis-Ci has trouble with
+# conflicting boost versions
+#add_subdirectory( DescentGame )
 
 if(UNIX)
 	add_subdirectory( DescentTest )

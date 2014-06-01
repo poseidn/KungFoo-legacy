@@ -13,7 +13,8 @@ public:
 	// the bigger, the more speed is removed
 	constexpr static float MovementDecayStatic = 4.0f;
 
-	constexpr static float MaxStuckAngle = boost::math::constants::pi<float>() * 0.6f;
+	// fixed to work with older boost version 
+	constexpr static float MaxStuckAngle = /* boost::math::constants::pi<float>() */ 6.28 * 0.6f;
 
 	constexpr static float AttackRange = 1.7f;
 	constexpr static float AttackRangeSquared = AttackRange * AttackRange;

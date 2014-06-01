@@ -4,7 +4,7 @@ compiler:
   - clang
 
 install:
-  - sudo apt-get install cmake
+  - sudo apt-get install cmake libboost-dev libsdl1.2-dev
   
   
 before_script:

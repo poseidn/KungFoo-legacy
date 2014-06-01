@@ -3,3 +3,14 @@ compiler:
   - gcc
   - clang
 
+install:
+  - sudo apt-get install cmake
+  
+  
+before_script:
+  - mkdir _build
+  - cd _build
+  
+script:
+  - cmake ../src
+  

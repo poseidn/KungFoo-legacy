@@ -22,5 +22,6 @@ before_script:
 script:
   - cmake ../src
   - make -j4
-    
+  - DescentTest/DescentTest
+  
   

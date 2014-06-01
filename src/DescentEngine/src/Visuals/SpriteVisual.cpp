@@ -24,7 +24,7 @@ const SpriteVisual::NormalBufferArray SpriteVisual::m_defaultNormalBuffer = { 0,
 
 // todo: fix this in MT mode
 void SpriteVisual::nextFrame() {
-	if ((m_currentFrame + 1) == getTexture()->getAnimationFrames())
+	if (size_t(m_currentFrame + 1) == getTexture()->getAnimationFrames())
 		m_currentFrame = 0;
 	else
 		m_currentFrame++;

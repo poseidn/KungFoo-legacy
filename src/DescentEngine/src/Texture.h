@@ -38,7 +38,7 @@ public:
 		return (m_animationFrames > 1);
 	}
 
-	unsigned int getAnimationFrames() const {
+	size_t getAnimationFrames() const {
 		return m_animationFrames;
 	}
 

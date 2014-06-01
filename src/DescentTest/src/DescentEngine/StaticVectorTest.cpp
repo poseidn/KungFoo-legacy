@@ -13,15 +13,15 @@ TEST(StaticVectorTest, push_get) {
 	ASSERT_EQ(24, ref2.get());
 	ASSERT_EQ(25, ref3.get());
 
-	ASSERT_EQ(3, sVect.activeSize());
+	ASSERT_EQ(size_t(3), sVect.activeSize());
 
 	sVect.remove(ref2);
 
-	ASSERT_EQ(2, sVect.activeSize());
+	ASSERT_EQ(size_t(2), sVect.activeSize());
 
 	auto ref4 = sVect.push_back(45);
 	ASSERT_EQ(45, ref4.get());
-	ASSERT_EQ(3, sVect.activeSize());
+	ASSERT_EQ(size_t(3), sVect.activeSize());
 
 	auto findInsert = [] ( int const& it ) -> bool {return it > 30;};
 	auto ref5 = sVect.push(55, findInsert);

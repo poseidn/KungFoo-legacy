@@ -1,0 +1,106 @@
+# to compile with clang, use: 
+# cmake ../src/ -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_COMPILER=/usr/bin/clang
+# to do a scan-build static analysis run
+# cmake -DCMAKE_CXX_COMPILER=c++-analyzer  -DCMAKE_C_COMPILER=ccc-analyzer ../src/
+# scan-build make
+#
+# or custom build
+# cmake -DCMAKE_CXX_COMPILER=/home/poseidon/dev/llvm-clang/build/Release+Asserts/bin/clang++  
+# -DCMAKE_C_COMPILER=/home/poseidon/dev/llvm-clang/build/Release+Asserts/bin/clang ../src/
+ 
+set (COMMON_COMPILE_FLAGS " -DUSE_SDL=1 -Werror -Wfatal-errors -Wall -Wno-deprecated-declarations -Wno-strict-aliasing -Wno-int-to-pointer-cast -Wno-unused-private-field -Wno-reorder -Wno-unused-variable -Wno-overloaded-virtual -std=c++0x -pedantic")
+#set (COMMON_COMPILE_FLAGS " -DUSE_SDL=1 -std=c++0x")
+
+# gcc specific
+#set (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -Wno-maybe-uninitialized -Wno-unused-but-set-variable" )
+
+# clang 3.4 specific
+# will have LTO with clang 
+set (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}" )
+
+# enable profiling in the build
+#set (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -DDESCENT_PROFILE=1" )
+# automatic reloading of Lua scripts 
+set (COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} -DDESCENT_FILE_WATCH=1" ) 
+
+if(WIN32)
+	# will use the static runtime for all compiled files
+	if ( MSVC )
+		configure_msvc_runtime()
+	endif ()
+
+	set ( WIN_LIBRARY_ROOT "c:\\dev\\" )
+	# boost
+	include_directories (  ${WIN_LIBRARY_ROOT}boost_1_50_0\\ )
+	link_directories (  ${WIN_LIBRARY_ROOT}boost_1_50_0\\stage\\lib )
+	
+	# bullet
+	include_directories (  ${WIN_LIBRARY_ROOT}bullet-2.80-rev2531-src\\src )
+	link_directories (  ${WIN_LIBRARY_ROOT}bullet-2.80-rev2531-src\\lib )
+	
+	# SDL
+	include_directories (  ${WIN_LIBRARY_ROOT}SDL-devel\\include )
+	link_directories (  ${WIN_LIBRARY_ROOT}SDL-devel\\lib\\x86 )
+	
+	# SDL image
+	include_directories (  ${WIN_LIBRARY_ROOT}SDL_image-devel\\include )
+	link_directories (  ${WIN_LIBRARY_ROOT}SDL_image-devel\\lib\\x86 )
+
+	# SDL mixer
+	include_directories (  ${WIN_LIBRARY_ROOT}SDL_mixer-devel\\include )
+	link_directories (  ${WIN_LIBRARY_ROOT}SDL_mixer-devel\\lib\\x86 )
+	
+	# static is neede for the mingw build to prevent loading different (conflicting) 
+	# versions of the c/c++ runtime library
+	set (GENERAL_COMPILE_FLAGS " ${COMMON_COMPILE_FLAGS} -DUSE_THREADING_NULL=1 -static")
+	
+	set(CMAKE_CXX_FLAGS "-O3 -g ${GENERAL_COMPILE_FLAGS}" )
+endif()
+
+if(UNIX)
+
+	set (GENERAL_COMPILE_FLAGS "-DUSE_THREADING_CPP11=1")
+	
+	# enable this, if you want to include google perf tools in the compile to sample 
+	# a runtime profile
+	#set (COMPILE_WITH_PROFILER 1 )
+
+	if ( COMPILE_WITH_PROFILER )
+		set (GENERAL_COMPILE_FLAGS " ${GENERAL_COMPILE_FLAGS} -DUSE_PROFILER=1" )
+	endif ()
+
+
+	# disable unused var warning because this makes commenting out code fragments very annoying
+	#set (DESCENT_COMPILE_FLAGS "-DUSE_SDL_OPENGL=1")
+	#  -Wno-unused-but-set-variable  does not work with clang ..
+	set (GENERAL_COMPILE_FLAGS " ${GENERAL_COMPILE_FLAGS} ${COMMON_COMPILE_FLAGS}")
+
+	## go for it, big time
+    #set(CMAKE_CXX_FLAGS "-g -O2 -march=native -Werror --param vect-max-version-for-alias-checks=30 -ftree-vectorizer-verbose=0 -std=gnu++0x -pthread  -Wfatal-errors ")
+
+    # for gcov use: -fprofile-arcs -ftestcoverage
+    # mega highly optimized: use with gcc 4.7 and link libs statically ( due to LTO )
+    #set(CMAKE_CXX_FLAGS "-Ofast --param vect-max-version-for-alias-checks=50  -flto -flto-report -Werror -Wall -std=c++11 -pedantic -pthread")
+
+	## for fast debug compiles
+    set(CMAKE_CXX_FLAGS "-O3 -g -ggdb ${GENERAL_COMPILE_FLAGS}" )
+
+	# LTO:  does work with -g, produces wrong results
+	# when using -fuse-linker-plugin, GIMPLE from .a files are used during the LTO process by the linker
+	# http://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+	# using 3 threads to compile
+	## STATUS: compiles, but not fully due to some problems with defined symbols
+	##         might be solved by fixing the general symbol messS
+	#set(CMAKE_CXX_FLAGS "-Ofast -flto=3 -flto-report -fuse-linker-plugin ${GENERAL_COMPILE_FLAGS}")
+
+    #set(CMAKE_CXX_COMPILER "/home/poseidon/dev/llvm/build/Release+Asserts/bin/clang++" )
+    #set(CMAKE_CXX_COMPILER "llvm-g++")
+    
+    ## gcc 4.7 needed to have initializer lists 
+    #if ( EXISTS "/home/poseidon/dev/gcc-4.7.1-bin/bin/g++" )
+   	#set(CMAKE_CXX_COMPILER "g++-4.7.1")
+    #endif()
+    
+    # oh yeah, baby
+    #set(CMAKE_CXX_COMPILER clang++)
+endif()

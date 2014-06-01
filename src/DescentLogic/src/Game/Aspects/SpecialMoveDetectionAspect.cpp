@@ -69,7 +69,7 @@ void SpecialMoveDetectionAspect::initReport(PlayerReport & rep) {
 		return cont.keyDownKick();
 	}, KeyPressReport(InputItem::KeyPressEnum::KeyB));
 
-	constexpr float quaterPi = boost::math::constants::pi<float>() * 0.25f;
+	const float quaterPi = boost::math::constants::pi<float>() * 0.25f;
 
 	rep.m_rightDirectionReport = Reporter<DirectionReport>([quaterPi]( InputContainer const& cont)-> bool {
 		if (cont.isStickOneMoved()) {
